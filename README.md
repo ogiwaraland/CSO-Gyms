@@ -1,5 +1,6 @@
 # CSO-Gyms
-[index.html](https://github.com/user-attachments/files/28428945/index.html)
+[ index.html](https://github.com/user-attachments/files/28459863/index.html)
+
 <!DOCTYPE html>
 <html lang="ja">
 <head>
@@ -271,8 +272,14 @@ body{font-family:-apple-system,'Hiragino Sans','Yu Gothic UI',sans-serif;backgro
 
 <!-- SCHEDULE -->
 <div class="panel" id="panel-schedule">
-  <div class="sec-title" style="margin-top:0"><span class="sec-dot" style="background:var(--green)"></span>今週のカレンダー</div>
+  <div class="sec-title" style="margin-top:0"><span class="sec-dot" style="background:var(--green)"></span>週間カレンダー</div>
+  <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:10px">
+    <button id="btnPrev" onclick="changeWeek(-1)" style="padding:10px 20px;background:var(--surface2);border:1.5px solid var(--border2);border-radius:var(--radius);color:var(--text);font-size:18px;font-weight:700;cursor:pointer">◀ 前の週</button>
+    <div id="weekLabel" style="font-size:15px;font-weight:700;color:var(--text2);text-align:center"></div>
+    <button id="btnNext" onclick="changeWeek(1)" style="padding:10px 20px;background:var(--surface2);border:1.5px solid var(--border2);border-radius:var(--radius);color:var(--text);font-size:18px;font-weight:700;cursor:pointer">次の週 ▶</button>
+  </div>
   <div class="week-grid" id="weekGrid"></div>
+  <div id="dayDetail" style="margin-bottom:14px"></div>
   <div class="sec-title"><span class="sec-dot" style="background:var(--blue)"></span>週間プログラム</div>
   <div class="card" id="weeklyProg"></div>
   <div class="sec-title"><span class="sec-dot" style="background:var(--coral)"></span>怪我への対応メモ</div>
@@ -322,11 +329,27 @@ const upperFull=[
   {name:'ケトルベルスイング（低強度）',detail:'12kg × 3セット × 15回',caution:'腰に注意'},
   {name:'ディップス',detail:'自重 × 3セット × 5〜8回',caution:'肩痛時は浅く'},
   {name:'ネガティブ懸垂',detail:'3セット × 5回（5秒下ろす）',caution:'補助つきでもOK'},
+  // 大胸筋
+  {name:'ダンベル フライ（ベンチ）',detail:'10kg × 3セット × 12回',caution:'大胸筋伸展'},
+  {name:'ダンベル インクラインプレス（ベンチ角度上げ）',detail:'10kg × 3セット × 10回',caution:'大胸筋上部'},
+  // 上腕二頭筋
+  {name:'ハンマーカール',detail:'10kg × 3セット × 12回',caution:'肘固定'},
+  {name:'コンセントレーションカール',detail:'10kg × 3セット × 10回',caution:'孤立させて集中'},
+  // 上腕三頭筋
+  {name:'ダンベル トライセプスエクステンション',detail:'7kg × 3セット × 12回',caution:'肘が開かないよう'},
+  {name:'ダンベル キックバック（三頭筋）',detail:'7kg × 3セット × 12回',caution:'肘を高く保つ'},
+  // 三角筋
+  {name:'ダンベル サイドレイズ',detail:'7kg × 3セット × 15回',caution:'三角筋中部'},
+  {name:'ダンベル フロントレイズ',detail:'7kg × 3セット × 12回',caution:'三角筋前部'},
+  {name:'ダンベル リアレイズ（前傾）',detail:'7kg × 3セット × 15回',caution:'三角筋後部・猫背改善'},
 ];
 const upperShort=[
   {name:'ダンベル チェストプレス',detail:'10kg × 2セット × 12回',caution:null},
   {name:'ダンベル ロウ',detail:'15kg × 2セット × 12回',caution:null},
   {name:'フェイスプル（BARWINGマシン）',detail:'2セット × 15回',caution:'猫背改善'},
+  {name:'ダンベル フライ',detail:'10kg × 2セット × 12回',caution:'大胸筋'},
+  {name:'サイドレイズ',detail:'7kg × 2セット × 15回',caution:'三角筋'},
+  {name:'トライセプスエクステンション',detail:'7kg × 2セット × 12回',caution:'三頭筋'},
 ];
 const lowerFull=[
   {name:'ハーフスクワット（ダンベル持ち）',detail:'10kg × 3セット × 12回',caution:'痛みは浅めに'},
@@ -362,7 +385,7 @@ const weeklyData=[
   {day:'月曜日',label:'上半身A + 体幹',dur:'60分',type:'upper',icon:'💪',desc:'胸・背中中心。ダンベル＋BARWINGマシン'},
   {day:'火曜日',label:'下半身A + ウォーキング',dur:'60分',type:'lower',icon:'🦵',desc:'大腿四頭筋・臀部。低衝撃スクワット'},
   {day:'水曜日',label:'体幹 + バランスボール',dur:'30分',type:'core',icon:'🔥',desc:'軽め。姿勢改善・腰痛予防・バランスボール'},
-  {day:'木曜日',label:'上半身B + ディップス',dur:'60分',type:'upper',icon:'💪',desc:'肩・腕・背中。ディップス・ネガティブ懸垂も'},
+  {day:'木曜日',label:'上半身B + 三角筋・腕',dur:'60分',type:'upper',icon:'💪',desc:'三角筋・二頭筋・三頭筋。ディップス・サイドレイズ'},
   {day:'金曜日',label:'下半身B + ウォーキング',dur:'60分',type:'lower',icon:'🦵',desc:'ふくらはぎ・臀部・体幹の複合'},
   {day:'土曜日',label:'完全休養',dur:'休み',type:'rest',icon:'😴',desc:'畑仕事もOK！軽いストレッチ推奨'},
   {day:'日曜日',label:'ウォーキングのみ（任意）',dur:'30分',type:'walk',icon:'🚶',desc:'ルームランナーでリカバリー歩行'},
@@ -429,6 +452,15 @@ const libraryData=[
   {name:'ストレッチポール 肩甲骨ほぐし',cat:'stretch',tags:['ストレッチポール','リカバリー','肩こり'],desc:'ポールに仰向けに乗り腕を左右に広げてゆっくり動かす。肩甲骨まわりをほぐす。肩・首の痛みケアに効果的。',sets:'左右各30秒 × 3セット'},
   {name:'ストレッチポール 腰椎ストレッチ',cat:'stretch',tags:['ストレッチポール','リカバリー','腰痛ケア'],desc:'ポールを腰の下に横置きして仰向けに乗る。腰椎のアーチを整える。腰痛持ちに特に効果的。痛みが出たら中止。',sets:'60秒 × 2セット'},
   {name:'ストレッチポール 股関節ストレッチ',cat:'stretch',tags:['ストレッチポール','リカバリー','下半身'],desc:'ポールに仰向けに乗り膝を曲げて左右にゆっくり倒す。股関節・内転筋のストレッチ。下半身トレーニング後のケアに最適。',sets:'左右各30秒 × 3セット'},
+  {name:'ダンベル フライ',cat:'upper',tags:['上半身','大胸筋'],desc:'ベンチに仰向けになりダンベルを弧を描くように開閉する。大胸筋の伸展・収縮を最大限に使える種目。チェストプレスと組み合わせると効果的。',sets:'10kg × 3セット × 12回'},
+  {name:'ダンベル インクラインプレス',cat:'upper',tags:['上半身','大胸筋上部'],desc:'ベンチを30〜45度に傾けてプレス。大胸筋上部を集中強化。猫背改善・胸の厚みづくりに効果的。',sets:'10kg × 3セット × 10回'},
+  {name:'ハンマーカール',cat:'upper',tags:['上半身','上腕二頭筋'],desc:'親指を上に向けた状態でダンベルを曲げる。上腕二頭筋・腕橈骨筋を同時強化。通常カールより腕全体を太くする効果あり。',sets:'10kg × 3セット × 12回'},
+  {name:'コンセントレーションカール',cat:'upper',tags:['上半身','上腕二頭筋'],desc:'座位で肘を膝に固定してカール。上腕二頭筋を孤立させて集中的に鍛える。力こぶを作るのに最も効果的な種目。',sets:'10kg × 3セット × 10回'},
+  {name:'トライセプスエクステンション',cat:'upper',tags:['上半身','上腕三頭筋'],desc:'頭の後ろでダンベルを持ち肘を伸ばす。上腕三頭筋の長頭を集中強化。二の腕引き締めに効果的。肘が外に開かないよう注意。',sets:'7kg × 3セット × 12回'},
+  {name:'ダンベル キックバック（三頭筋）',cat:'upper',tags:['上半身','上腕三頭筋'],desc:'前傾姿勢で肘を高く保ちダンベルを後ろに伸ばす。上腕三頭筋外側頭の強化。肘の位置を固定してゆっくり動かす。',sets:'7kg × 3セット × 12回'},
+  {name:'サイドレイズ',cat:'upper',tags:['上半身','三角筋中部'],desc:'肘を少し曲げてダンベルを真横に上げる。三角筋中部を集中強化。肩幅を広くする定番種目。肩の痛みに注意して軽めから始める。',sets:'7kg × 3セット × 15回'},
+  {name:'フロントレイズ',cat:'upper',tags:['上半身','三角筋前部'],desc:'ダンベルを正面に肩の高さまで上げる。三角筋前部の強化。猫背の人は特に前部が弱いことが多い。',sets:'7kg × 3セット × 12回'},
+  {name:'リアレイズ（前傾）',cat:'upper',tags:['上半身','三角筋後部','猫背改善'],desc:'上体を前傾させてダンベルを横に開く。三角筋後部・菱形筋を強化。猫背・巻き肩の改善に最も効果的な種目のひとつ。',sets:'7kg × 3セット × 15回'},
   {name:'ルームランナー ウォーキング',cat:'walk',tags:['ウォーキング','有酸素','低衝撃'],desc:'傾斜1〜3°、速度4〜5km/hで速歩き。膝・足首への衝撃を最小限に。脂肪燃焼・体力向上に。走らないこと。',sets:'30〜60分 ｜ 週3〜5回'},
 ];
 
@@ -542,44 +574,145 @@ function updWalk(){
 function pad(n){return String(n).padStart(2,'0');}
 
 function completeWorkout(){
-  const done=Object.values(checked).filter(Boolean).length;
-  const all=warmupData.length+(duration===60?upperFull.length+lowerFull.length+coreFull.length:upperShort.length+lowerShort.length+coreShort.length);
-  const note=document.getElementById('todayNotes').value;
-  hist.unshift({date:new Date().toLocaleDateString('ja-JP'),dur:duration,done:done,total:all,walk:Math.floor(walkSec/60),note:note,stars:0});
-  if(hist.length>50)hist.pop();
-  localStorage.setItem('hgHist',JSON.stringify(hist));
   wkCnt=Math.min(5,wkCnt+1);
   localStorage.setItem('hgWk',String(wkCnt));
   checked={};renderToday();resetWalk();
   document.getElementById('todayNotes').value='';
-  alert('✅ トレーニングを記録しました！\nお疲れ様でした！');
-  switchTab('history','tab3');renderHistory();
+  updateWeekDots();
+  alert('✅ トレーニング完了！\nお疲れ様でした！💪');
 }
 
+let weekOffset=0;
+function changeWeek(dir){
+  const next=weekOffset+dir;
+  if(next<-3||next>3){
+    alert(next<0?'3週前までしか遡れません':'3週先までしか進めません');
+    return;
+  }
+  weekOffset=next;
+  renderWeekGrid();
+}
 function renderWeekGrid(){
-  const today=new Date();const dow=today.getDay();
+  const today=new Date();
+  const dow=today.getDay();
+  // 今週の月曜日を基準にoffset週分ずらす
+  const monday=new Date(today);
+  monday.setDate(today.getDate()-dow+(dow===0?-6:1)+weekOffset*7);
+
   const labels=['休養','上半身','下半身','体幹','上半身','下半身','歩行'];
+  const types=['rest','upper','lower','core','upper','lower','walk'];
+
+  // 週ラベル
+  const weekStart=new Date(monday);
+  const weekEnd=new Date(monday);weekEnd.setDate(monday.getDate()+6);
+  const isCurrent=weekOffset===0;
+  const isPast=weekOffset<0;
+  const label=isCurrent?'今週':(isPast?`${Math.abs(weekOffset)}週前`:`${weekOffset}週後`);
+  document.getElementById('weekLabel').innerHTML=
+    `${label}<br><span style="font-size:12px;font-weight:500">${weekStart.getMonth()+1}/${weekStart.getDate()}（月）〜 ${weekEnd.getMonth()+1}/${weekEnd.getDate()}（日）</span>`;
+  // ボタンの有効・無効を更新
+  const btnPrev=document.getElementById('btnPrev');
+  const btnNext=document.getElementById('btnNext');
+  if(btnPrev){btnPrev.style.opacity=weekOffset<=-3?'0.3':'1';btnPrev.style.cursor=weekOffset<=-3?'not-allowed':'pointer';}
+  if(btnNext){btnNext.style.opacity=weekOffset>=3?'0.3':'1';btnNext.style.cursor=weekOffset>=3?'not-allowed':'pointer';}
+
   let h='';
   DAYS_JP.forEach((d,i)=>{
-    const dt=new Date(today);dt.setDate(today.getDate()+(i-dow));
-    const cls=i===dow?'today':(i===0||i===6?'rest':'');
-    h+=`<div class="day-cell ${cls}"><div class="day-name">${d}</div><div class="day-num">${dt.getDate()}</div><div class="day-type">${labels[i]}</div></div>`;
+    // i=0が日曜なので月曜起点に並べ直す
+    const dayIndex=(i+1)%7; // 月=0,火=1,...,日=6
+    const dt=new Date(monday);dt.setDate(monday.getDate()+i);
+    const isToday=isCurrent&&dt.toDateString()===today.toDateString();
+    const isRest=(i===5||i===6);
+    const cls=isToday?'today':(isRest?'rest':'');
+    const dayLabel=['月','火','水','木','金','土','日'][i];
+    h+=`<div class="day-cell ${cls}" onclick="showDayDetail(${i},'${dt.getMonth()+1}/${dt.getDate()}')">
+      <div class="day-name">${dayLabel}</div>
+      <div class="day-num">${dt.getDate()}</div>
+      <div class="day-type">${labels[(i+1)%7]}</div>
+    </div>`;
   });
   document.getElementById('weekGrid').innerHTML=h;
+  document.getElementById('dayDetail').innerHTML='';
+}
+
+const dayPrograms=[
+  {label:'上半身A + 体幹',icon:'💪',dur:'60分',desc:'胸・背中中心。ダンベル＋BARWINGマシン',cats:['upper','core']},
+  {label:'下半身A + ウォーキング',icon:'🦵',dur:'60分',desc:'大腿四頭筋・臀部。低衝撃スクワット',cats:['lower','walk']},
+  {label:'体幹 + バランスボール',icon:'🔥',dur:'30分',desc:'軽め。姿勢改善・腰痛予防・バランスボール',cats:['core','ball','roller','stretch']},
+  {label:'上半身B + ディップス',icon:'💪',dur:'60分',desc:'肩・腕・背中。ディップス・ネガティブ懸垂',cats:['upper','dips']},
+  {label:'下半身B + ウォーキング',icon:'🦵',dur:'60分',desc:'ふくらはぎ・臀部・体幹の複合',cats:['lower','band','mball']},
+  {label:'完全休養',icon:'😴',dur:'休み',desc:'畑仕事もOK！軽いストレッチ推奨',cats:[]},
+  {label:'ウォーキングのみ（任意）',icon:'🚶',dur:'30分',desc:'ルームランナーでリカバリー歩行',cats:['walk']},
+];
+
+function showDayDetail(dayIdx, dateStr){
+  const prog=dayPrograms[dayIdx];
+  const relatedCats=prog.cats;
+  const customForDay=customExercises.filter(e=>relatedCats.includes(e.cat));
+
+  // 標準種目を組み立て
+  const allExercises=[];
+  if(relatedCats.includes('upper')){upperFull.forEach(e=>allExercises.push({...e,group:'上半身'}));}
+  if(relatedCats.includes('lower')){lowerFull.forEach(e=>allExercises.push({...e,group:'下半身'}));}
+  if(relatedCats.includes('core')){coreFull.forEach(e=>allExercises.push({...e,group:'体幹'}));}
+  if(relatedCats.includes('walk')){allExercises.push({name:'ルームランナー ウォーキング',detail:'30〜60分 速度4〜5km/h',caution:'走らない',group:'ウォーキング'});}
+  customForDay.forEach(e=>allExercises.push({...e,group:'追加種目'}));
+
+  const exHtml=allExercises.map(e=>`
+    <div style="display:flex;align-items:center;gap:10px;padding:7px 0;border-top:1px solid var(--border)">
+      <div style="font-size:11px;padding:2px 7px;border-radius:5px;background:var(--surface2);color:var(--text3);white-space:nowrap;font-weight:600">${e.group}</div>
+      <div style="flex:1">
+        <div style="font-size:14px;color:var(--text);font-weight:500">${e.name}</div>
+        <div style="font-size:12px;color:var(--text3)">${e.detail}</div>
+      </div>
+      ${e.caution?`<div style="font-size:11px;color:var(--coral-dark);background:var(--coral-light);padding:2px 7px;border-radius:5px;font-weight:600;white-space:nowrap">${e.caution}</div>`:''}
+    </div>`).join('');
+
+  document.getElementById('dayDetail').innerHTML=`
+    <div style="background:var(--surface);border:1.5px solid var(--green);border-radius:var(--radius-lg);padding:16px 18px;margin-top:10px">
+      <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:12px">
+        <div>
+          <div style="font-size:13px;color:var(--text3);font-weight:600">${dateStr} の予定</div>
+          <div style="font-size:16px;font-weight:700;color:var(--text);margin-top:2px">${prog.icon} ${prog.label}</div>
+        </div>
+        <span style="font-size:13px;padding:5px 12px;background:var(--green-light);color:var(--green-dark);border-radius:8px;font-weight:700">⏱ ${prog.dur}</span>
+      </div>
+      ${exHtml.length>0?exHtml:`<div style="font-size:14px;color:var(--text3);text-align:center;padding:16px">休養日 — しっかり休みましょう！</div>`}
+      ${customForDay.length>0?`<div style="margin-top:10px;padding:8px 12px;background:var(--purple-light);border-radius:8px;font-size:12px;color:var(--purple-dark);font-weight:600">➕ 追加種目 ${customForDay.length}件含む</div>`:''}
+    </div>`;
 }
 
 function renderWeeklyProg(){
   const colors={upper:'prog-upper',lower:'prog-lower',core:'prog-core',walk:'prog-walk',rest:'prog-rest'};
-  document.getElementById('weeklyProg').innerHTML=weeklyData.map(p=>`
-    <div class="program-row">
+  // カテゴリーと曜日のマッピング
+  // 月(1)=upper, 火(2)=lower, 水(3)=core/ball/roller/stretch, 木(4)=upper+dips, 金(5)=lower+band, 土(6)=rest, 日(0)=walk
+  const catToDays={
+    upper:[0,3],lower:[1,4],core:[2],ball:[2],mball:[1,4],
+    dips:[3],roller:[2],band:[1,4],stretch:[0,1,2,3,4],walk:[6]
+  };
+  const dayNames=['日','月','火','水','木','金','土'];
+
+  document.getElementById('weeklyProg').innerHTML=weeklyData.map((p,idx)=>{
+    // 対応カテゴリーのカスタム種目を取得
+    const relatedCats=Object.keys(catToDays).filter(cat=>catToDays[cat].includes(idx));
+    const customForDay=customExercises.filter(e=>relatedCats.includes(e.cat));
+    const customHtml=customForDay.length>0
+      ?`<div style="margin-top:8px;padding:6px 10px;background:var(--purple-light);border-radius:8px">
+          <div style="font-size:11px;font-weight:700;color:var(--purple-dark);margin-bottom:4px">➕ 追加種目</div>
+          ${customForDay.map(e=>`<div style="font-size:12px;color:var(--purple-dark);padding:2px 0">・${e.name}（${e.detail}）</div>`).join('')}
+        </div>`
+      :'';
+    return `<div class="program-row">
       <div class="prog-icon ${colors[p.type]}">${p.icon}</div>
       <div class="prog-content">
         <div class="prog-day">${p.day}</div>
         <div class="prog-name">${p.label}</div>
         <div class="prog-desc">${p.desc}</div>
         <div class="prog-time">⏱ ${p.dur}</div>
+        ${customHtml}
       </div>
-    </div>`).join('');
+    </div>`;
+  }).join('');
   document.getElementById('injuryBox').innerHTML=injuryItems.map(t=>`<div class="injury-item">${t}</div>`).join('');
 }
 
